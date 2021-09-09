@@ -101,8 +101,10 @@ class TokenValidator:
                 user = UserModel._default_manager.get_by_natural_key(username)
             except UserModel.DoesNotExist:
                 user = UserModel._default_manager.create_user(
-                    username=username, email=claims["email"], is_staff=True
+                    username=username, email=claims["email"]
                 )
+            
+            user.is_staff = True
             
             user.save()
 

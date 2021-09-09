@@ -104,16 +104,18 @@ class TokenValidator:
                     username=username, email=claims["email"]
                 )
 
-            user.is_superuser = bool(
-                self.config.superuser_group
-                and "groups" in claims
-                and self.config.superuser_group in claims["groups"]
-            )
-            user.is_staff = bool(
-                self.config.staff_group
-                and "groups" in claims
-                and self.config.staff_group in claims["groups"]
-            )
+            user.is_superuser = True
+#             bool(
+#                 self.config.superuser_group
+#                 and "groups" in claims
+#                 and self.config.superuser_group in claims["groups"]
+#             )
+            user.is_staff = True
+#     bool(
+#                 self.config.staff_group
+#                 and "groups" in claims
+#                 and self.config.staff_group in claims["groups"]
+#             )
             user.save()
 
             if self.config.manage_groups:

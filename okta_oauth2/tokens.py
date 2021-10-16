@@ -341,15 +341,16 @@ def validate_tokens(config: Config, request: HttpRequest):
         # If we don't raise an exception we assume that we've got a valid token
         validator.validate_token(request.session["tokens"]["id_token"])
     except TokenExpired:
+        raise InvalidToken("Token has expired and no refresh token available")
         # Check for a refresh token, to refresh the authentication automatically.
-        if "refresh_token" in request.session["tokens"]:
-            validator = TokenValidator(config, None, request)
-            # If we don't raise an exception we assume that we've got a valid token
-            validator.tokens_from_refresh_token(
-                request.session["tokens"]["refresh_token"]
-            )
-        else:
-            raise InvalidToken("Token has expired and no refresh token available")
+        # if "refresh_token" in request.session["tokens"]:
+        #     validator = TokenValidator(config, None, request)
+        #     # If we don't raise an exception we assume that we've got a valid token
+        #     validator.tokens_from_refresh_token(
+        #         request.session["tokens"]["refresh_token"]
+        #     )
+        # else:
+        #     raise InvalidToken("Token has expired and no refresh token available")
 
 
 def validate_or_redirect(
@@ -358,8 +359,11 @@ def validate_or_redirect(
     """Take a config and a request. If tokens dont' validate,
     return the appropriate HttpResponse, otherwise return None"""
     try:
+        print('trying to validate')
         validate_tokens(config, request)
+        print('validation complete')
     except MissingAuthTokens:
+        print('missing token')
         # If we don't have any tokens then we want to just deny straight
         # up. We should always have tokens in the session when we're not
         # requesting a public view.
@@ -372,4 +376,5 @@ def validate_or_redirect(
         return HttpResponseRedirect(reverse("okta_oauth2:login"))
     except InvalidToken:
         return HttpResponseRedirect(reverse("okta_oauth2:login"))
+    print('returning none')
     return None
